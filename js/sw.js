@@ -12,7 +12,7 @@ self.addEventListener('install', function (event) {
           '/js/dbhelper.js',
           '/js/retaurant_info.js',
           '/js/register.js',
-           '/css/style.css'
+           '/css/styles.css'
      ]).catch(error=>{
         console.log("Error retrieving cache");
      });
