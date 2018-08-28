@@ -41,6 +41,9 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   min-height: 100%;
   width: 100%;
 }
+.map-description{
+  display: none;
+}
 #footer {
   background-color: #444;
   color: #aaa;
@@ -75,7 +78,7 @@ nav h1 a {
     background-color: #eee;
     font-size: 17px;
     margin: 0;
-    width: calc(50% - 80px);
+    max-width: 100%;
 }
 
 /* Display list items side by side */
