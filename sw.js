@@ -5,6 +5,7 @@ self.addEventListener('install', function (event) {
       return cache.addAll([
           '/', 
           '/index.html',
+          '/restaurant.html',
           '/index.html?restaurant=1',
           '/data/restaurants.json',
           '/js/',
@@ -34,6 +35,8 @@ self.addEventListener('install', function (event) {
           }
          
           var fetchRequest = event.request.clone();
+          if(fetchRequest.url.includes("restaurant"))
+          fetchRequest=new Request("restaurant.html");
   
           return fetch(fetchRequest).then(
             function(response) {
