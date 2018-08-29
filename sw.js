@@ -21,30 +21,40 @@ self.addEventListener('install', function (event) {
   });
 
 
-  self.addEventListener('fetch', function (event) {
-    var requestUrl = new URL(event.request.url);
+  self.addEventListener('fetch', function(event) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(function(response) {
+          // Cache hit - return response
+          if (response) {
+            return response;
+          }
+          if(event.request!=="localhost"){
+            event.request.mode="no-cors";
+          }
+         
+          var fetchRequest = event.request.clone();
   
-    /*if (requestUrl.origin === location.origin) {
-      if (requestUrl.pathname === '/') {
-        event.respondWith(caches.match('/index.html').then(function(response){
-          return response ||fetch(event.request).then(function(result){
-            return result;
-          }).catch(function(error)
-        {
-          var error=error;
-        });
-        }));
-        return;
-      }
-      if (requestUrl.pathname.includes('restaurant')) {
-        event.respondWith(caches.match('/index.html?restaurant=1'));
-       // return;
-      }
-      
-    }*/
+          return fetch(fetchRequest).then(
+            function(response) {
+              // Check if we received a valid response
+              if(!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
   
-    event.respondWith(caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
-      }));
-
+              
+              var responseToCache = response.clone();
+  
+              caches.open(staticCacheName)
+                .then(function(cache) {
+                  cache.put(event.request, responseToCache);
+                });
+  
+              return response;
+            }
+          ).catch(function(error){
+            return new Response("App is not connected",{status:404,statusText:"not connected"})
+          });
+        })
+      );
   });
