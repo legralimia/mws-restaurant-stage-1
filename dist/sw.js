@@ -4,7 +4,7 @@
 var staticCacheName = "restaurant1";
 self.addEventListener('install', function (event) {
   event.waitUntil(caches.open(staticCacheName).then(function (cache) {
-    return cache.addAll(['/', '/index.html', '/restaurant.html', '/data/restaurants.json', '/js/', '/js/main.js', '/js/dbhelper.js', '/js/retaurant_info.js', '/js/register.js', '/css/styles.css', '/img/']).catch(function (error) {
+    return cache.addAll(['/', '/index.html', '/restaurant.html', '/data/restaurants.json', '/js/', '/js/main.js', '/js/retaurant_info.js', '/css/styles.css', '/img/']).catch(function (error) {
       console.log("Error retrieving cache");
     });
   }));

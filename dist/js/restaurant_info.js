@@ -26,17 +26,21 @@ function () {
     key: "fetchRestaurants",
 
     /**
+     * Database URL.
+     * Change this to restaurants.json file location on your server.
+     */
+
+    /**
      * Fetch all restaurants.
      */
     value: function fetchRestaurants(callback) {
       var xhr = new XMLHttpRequest();
-      xhr.open('GET', DBHelper.DATABASE_URL);
+      xhr.open('GET', "".concat(DBHelper.API_URL, "/restaurants"));
 
       xhr.onload = function () {
         if (xhr.status === 200) {
           // Got a success response from server!
-          var json = JSON.parse(xhr.responseText);
-          var restaurants = json.restaurants;
+          var restaurants = JSON.parse(xhr.responseText);
           callback(null, restaurants);
         } else {
           // Oops!. Got an error from server.
@@ -239,16 +243,10 @@ function () {
     } */
 
   }, {
-    key: "DATABASE_URL",
-
-    /**
-     * Database URL.
-     * Change this to restaurants.json file location on your server.
-     */
+    key: "API_URL",
     get: function get() {
-      var port = 8000; // Change this to your server port
-
-      return "http://localhost:".concat(port, "/data/restaurants.json");
+      var port = 1337;
+      return "http://localhost:".concat(port);
     }
   }]);
 
@@ -364,8 +362,8 @@ var fillRestaurantHTML = function fillRestaurantHTML() {
 
   var imagesrc = _dbhelper.default.imageUrlForRestaurant(restaurant).split(".");
 
-  var image1x = imagesrc[0] + "_1x." + imagesrc[1];
-  var image2x = imagesrc[0] + "_2x." + imagesrc[1];
+  var image1x = imagesrc[0] + "_1x.jpg";
+  var image2x = imagesrc[0] + "_2x.jpg";
   image.src = image1x;
   image.srcset = image1x + " 500w, " + image2x + " 300w";
   image.alt = restaurant.name + " Restaurant Promotional Image";
@@ -429,7 +427,7 @@ var fillReviewsHTML = function fillReviewsHTML() {
  */
 
 
-const createReviewHTML = function createReviewHTML(review) {
+var createReviewHTML = function createReviewHTML(review) {
   var li = document.createElement('li');
   var name = document.createElement('p');
   name.innerHTML = review.name;
