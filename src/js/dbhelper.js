@@ -1,6 +1,7 @@
 /**
  * Common database helper functions.
  */
+import dbPromise from './dbPromise';
 export default class DBHelper {
 
   static get API_URL(){
@@ -22,13 +23,35 @@ export default class DBHelper {
     xhr.onload = () => {
       if (xhr.status === 200) { // Got a success response from server!
         const restaurants = JSON.parse(xhr.responseText);
-       
+        dbPromise.putRestaurants(restaurants);
         callback(null, restaurants);
       } else { // Oops!. Got an error from server.
+        dbPromise.getRestaurants().then(r=>{
+          if(r.length>0)
+          {
+            callback(null,idbRestaurants)
+          }
+          else
+          {
+            callback('no restaurant in idb',null);
+          }
+        })
         const error = (`Request failed. Returned status of ${xhr.status}`);
         callback(error, null);
       }
     };
+    xhr.onerror=()=>{
+      console.log('Error while trying XHR, trying idb...');      
+      dbPromise.getRestaurants().then(idbRestaurants => {
+        if (idbRestaurants.length > 0) {
+          callback(null, idbRestaurants)
+        } else {
+          callback('No restaurants found in idb', null);
+        }
+      });
+    }
+
+
     xhr.send();
   }
 
@@ -36,15 +59,23 @@ export default class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
+    fetch(`${DBHelper.API_URL}/restaurants`)
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
       } else {
+        dbPromise.putRestaurants(restaurants);
         const restaurant = restaurants.find(r => r.id == id);
+
         if (restaurant) { // Got the restaurant
           callback(null, restaurant);
         } else { // Restaurant does not exist in the database
+          dbPromise.getRestaurants(id).then(r=>{
+            if (!r) return callback("Restaurant not found in idb either", null);
+                return callback(null, r);
+          })
+
           callback('Restaurant does not exist', null);
         }
       }
@@ -151,7 +182,7 @@ export default class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    return (`/img/${restaurant.photograph}.jpg`);
   }
 
   /**
